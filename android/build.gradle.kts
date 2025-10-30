@@ -5,20 +5,18 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Place Android build outputs under the Flutter project's top-level build/ folder to keep artifacts together
+val sharedBuildDir = file("../build")
+rootProject.buildDir = sharedBuildDir
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
+    // Each module builds into build/<module-name>
+    buildDir = File(rootProject.buildDir, name)
 }
 subprojects {
     project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
+    delete(rootProject.buildDir)
 }
